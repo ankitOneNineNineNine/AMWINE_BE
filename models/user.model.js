@@ -9,7 +9,8 @@ fullName: {
 },
 role: {
     type: String,
-    enum: ["ADMIN_P", "ADMIN_S", "User"]
+    enum: ["ADMIN_P", "ADMIN_S", "User"],
+    default: "User"
 },
 userName: {
     type: String,
@@ -25,6 +26,7 @@ password:{
     type:String,
     required:true
 },
+image: String,
 address:String,
 number:Number
 },
