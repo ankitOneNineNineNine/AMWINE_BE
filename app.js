@@ -3,7 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var authRouter = require('./routes/User/auth.route')
+var authRouter = require('./routes/User/auth.route');
+var adminAuth = require('./routes/Admin/admin.auth.route')
 require('./db')
 var cors = require('cors')
 var app = express();
@@ -18,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //auth route
 
 app.use('/auth', authRouter)
-
+app.use('/adminAuth',adminAuth )
 
 
 

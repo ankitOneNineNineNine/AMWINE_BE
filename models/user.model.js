@@ -7,7 +7,10 @@ fullName: {
     type:String,
     required:true,
 },
-
+role: {
+    type: String,
+    enum: ["ADMIN_P", "ADMIN_S", "User"]
+},
 userName: {
     type: String,
     required: true,
