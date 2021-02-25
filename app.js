@@ -8,7 +8,12 @@ var adminAuth = require('./routes/Admin/admin.auth.route');
 var userRoute = require('./routes/User/user.route')
 require('./db')
 var cors = require('cors');
+const publicProductRoute = require('./routes/Product/product.public.route')
+const privateProductRoute = require('./routes/Product/product.private.route')
 const authenticate = require('./middlewares/authenticate');
+const {secondaryAuthorization} = require('./middlewares/authorize')
+const {primaryAuthorization} = require('./middlewares/authorize')
+
 var app = express();
 
 app.use(cors())
@@ -19,6 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/ProfilePictures", express.static(path.join(__dirname, 'ProfilePictures')));
+app.use("/ProductImages", express.static(path.join(__dirname, 'ProductImages')));
 
 //auth route
 
@@ -28,6 +34,9 @@ app.use('/adminAuth',adminAuth )
 //userRoute
 app.use('/user', authenticate, userRoute)
 
+//productRoute
+app.use('/product', publicProductRoute)
+app.use('/authProduct', authenticate, secondaryAuthorization, privateProductRoute)
 
 
 // catch 404 and forward to error handler

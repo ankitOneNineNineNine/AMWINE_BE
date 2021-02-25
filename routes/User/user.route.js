@@ -1,7 +1,9 @@
 var express = require('express');
 const uploadProfileImage = require('../../middlewares/upload.profile');
 const { update } = require('../../models/user.model');
-const userModel = require('../../models/user.model')
+const userModel = require('../../models/user.model');
+const fs = require('fs');
+const path = require('path');
 var router = express.Router();
 
 router.route('/')
@@ -29,7 +31,10 @@ router.route('/')
   if(number){
     updatedUser.number = number;
   }
+  
   if(fileName){
+    let picPath = path.join(process.cwd(), `ProfilePictures/${req.loggedInUser.image}`);
+    fs.unlinkSync(picPath)
     updatedUser.image = fileName
   }
  if(address){
