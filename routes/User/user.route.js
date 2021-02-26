@@ -11,14 +11,15 @@ router.route('/')
   res.status(200).json(req.loggedInUser)
 })
 .put(uploadProfileImage.single('image'),function(req,res,next){
-  let {fullName, password, number, address} = req.body;
+  let {fullName, password, number, address,cart} = req.body;
+  console.log(req.body)
   let fileName;
- console.log(req.body)
+ 
   if(req.file){
      fileName = req.file.filename
   }
 
-  let updatedUser = {};
+  let updatedUser ={...req.loggedInUser};
   if(fullName){
     updatedUser.fullName = fullName
   }
@@ -39,6 +40,12 @@ router.route('/')
   }
  if(address){
    updatedUser.address = address;
+ }
+ if(cart){
+   if(req.body.action){
+     updatedUser.cart.push(cart)
+   }
+   else updatedUser.cart.splice(updatedUser.cart.indexOf(cart), 1)
  }
   userModel.findByIdAndUpdate(req.loggedInUser._id, updatedUser,{new: true}, function(err, afterUpdate){
     if(err){

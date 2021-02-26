@@ -28,7 +28,11 @@ password:{
 },
 image: String,
 address:String,
-number:Number
+number:Number,
+cart: [{
+    type: Schema.Types.ObjectId,
+    ref: 'wine'
+}]
 },
 {timestamps:true}
 )
