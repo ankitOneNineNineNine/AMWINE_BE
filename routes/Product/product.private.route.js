@@ -7,4 +7,7 @@ router.route('/')
 .post(uploadProductImages.array('images'),add)
 .put(update)
 
+
+
+
 module.exports = router;

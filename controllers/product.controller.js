@@ -1,16 +1,24 @@
 
+const product = require('../models/product.model')
 const productModel = require('../models/product.model')
-
-function get(req,res,next){
-  
+const moment = require('moment');
+function getAll(req,res,next){
+  let {pageNumber, itemsToShow} = req.body
         productModel.find({})
-        .then(products=>{
-           res.status(200).json(products)
-        })
-        .catch(err=>{
+        .sort({updatedAt:-1})
+        .skip((pageNumber-1)*itemsToShow)
+        .limit(+itemsToShow)
+       .exec(function(err, products){
+        if(err){
             return next(err)
-        })
-   
+        }
+        if(!products){
+            return next({
+                msg: 'No Products Found'
+            })
+        }
+        res.status(200).json(products)
+       })
 
 }
 function getById(req,res,next){
@@ -56,6 +64,71 @@ function add(req,res,next){
 function update(req,res,next){
     console.log(req.body)
 }
+function searchLatest(req,res,next){
+    let today = moment(new Date()).format('YYYY-MM-DD[T00:00:00.000Z]');
+    let reqdate = moment().add(-5, 'days').format('YYYY-MM-DD[T00:00:00.000Z]');
+    productModel.find({
+      updatedAt: {
+          $gte: reqdate
+      }              
+     })
+     .sort({updatedAt: -1})
+     .limit(10)
+     .exec(function(err, products){
+         if(err){
+             return next(err)
+         }
+         if(!products){
+             return next({
+                 msg: 'No Products Found'
+             })
+         }
+         res.status(200).json(products)
+     })
+}
+function getByName(req,res,next){
+    productModel.find({
+        name: req.body.name
+     })
+     .sort({updatedAt:-1})
+     .skip((pageNumber-1)*itemsToShow)
+     .limit(+itemsToShow)
+     .exec(function(err, products){
+         if(err){
+             return next(err)
+         }
+         if(!products){
+             return next({
+                 msg: 'No Products Found'
+             })
+         }
+         res.status(200).json(products)
+     })
+}
+function search(req,res,next){
+    let{min, max, type,variety,pageNumber,itemsToShow} = req.body;
+    productModel.find({
+       pType: { $in: type },
+       variety: { $in: variety },
+       price: {$gte: min, $lte: max} 
+    })
+    .sort({updatedAt:-1})
+    .skip((pageNumber-1)*itemsToShow)
+    .limit(+itemsToShow)
+    .exec(function(err, products){
+        if(err){
+            return next(err)
+        }
+        if(!products){
+            return next({
+                msg: 'No Products Found'
+            })
+        }
+        res.status(200).json(products)
+    })
+
+}
+
 module.exports = {
-    get, getById,add, update
+    getAll, getById,add, update, search,searchLatest, getByName
 }
