@@ -86,49 +86,56 @@ function searchLatest(req,res,next){
          res.status(200).json(products)
      })
 }
-function getByName(req,res,next){
-    productModel.find({
-        name: req.body.name
-     })
-     .sort({updatedAt:-1})
-     .skip((pageNumber-1)*itemsToShow)
-     .limit(+itemsToShow)
-     .exec(function(err, products){
-         if(err){
-             return next(err)
-         }
-         if(!products){
-             return next({
-                 msg: 'No Products Found'
-             })
-         }
-         res.status(200).json(products)
-     })
-}
+
 function search(req,res,next){
-    let{min, max, type,variety,pageNumber,itemsToShow} = req.body;
-    productModel.find({
-       pType: { $in: type },
-       variety: { $in: variety },
-       price: {$gte: min, $lte: max} 
-    })
-    .sort({updatedAt:-1})
-    .skip((pageNumber-1)*itemsToShow)
-    .limit(+itemsToShow)
-    .exec(function(err, products){
-        if(err){
-            return next(err)
-        }
-        if(!products){
-            return next({
-                msg: 'No Products Found'
-            })
-        }
-        res.status(200).json(products)
-    })
+    let{min,name, max, type,variety,pageNumber,itemsToShow} = req.body;
+    if(!type.length){
+        type = ['wine', 'beer']
+    }
+    if(!max || max === 0){
+        max = 15000
+    }
+    if(!variety.length){
+        variety = ["Chardonnay","Sparkle", "Booze", "Red"]
+    }
+    let queryModel;
+    if(!name.length){
+        queryModel =  productModel.find({
+            pType: { $in: type },
+            variety: { $in: variety },
+            price: {$gte: min, $lte: max} 
+         })
+
+    }
+    else{
+        queryModel =  productModel.find({
+            name: name,
+            pType: { $in: type },
+            variety: { $in: variety },
+            price: {$gte: min, $lte: max} 
+         })
+    }
+ 
+   
+   queryModel
+   .sort({updatedAt:-1})
+   .skip((pageNumber-1)*itemsToShow)
+   .limit(+itemsToShow)
+   .exec(function(err, products){
+       if(err){
+           return next(err)
+       }
+       if(!products){
+           return next({
+               msg: 'No Products Found'
+           })
+       }
+       console.log(products)
+       res.status(200).json(products)
+   })
 
 }
 
 module.exports = {
-    getAll, getById,add, update, search,searchLatest, getByName
+    getAll, getById,add, update, search,searchLatest
 }
