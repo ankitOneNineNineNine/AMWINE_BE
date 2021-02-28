@@ -86,8 +86,10 @@ function searchLatest(req,res,next){
          res.status(200).json(products)
      })
 }
-
-function search(req,res,next){
+async function getTotal(filter){
+    return await productModel.find(filter).count();
+}
+async function search(req,res,next){
     let{min,name, max, type,variety,pageNumber,itemsToShow} = req.body;
     if(!type.length){
         type = ['wine', 'beer']
@@ -99,29 +101,26 @@ function search(req,res,next){
         variety = ["Chardonnay","Sparkle", "Booze", "Red"]
     }
     let queryModel;
-    if(!name.length){
-        queryModel =  productModel.find({
-            pType: { $in: type },
-            variety: { $in: variety },
-            price: {$gte: min, $lte: max} 
-         })
 
-    }
-    else{
-        queryModel =  productModel.find({
-            name: name,
-            pType: { $in: type },
-            variety: { $in: variety },
-            price: {$gte: min, $lte: max} 
-         })
-    }
- 
-   
+    const filter = name.length? {
+        name: name,
+        pType: { $in: type },
+        variety: { $in: variety },
+        price: {$gte: min, $lte: max} 
+     }
+     : {
+        pType: { $in: type },
+        variety: { $in: variety },
+        price: {$gte: min, $lte: max} 
+     }
+     let count =await getTotal(filter);
+        queryModel =  productModel.find(filter)
+    
    queryModel
    .sort({updatedAt:-1})
    .skip((pageNumber-1)*itemsToShow)
    .limit(+itemsToShow)
-   .exec(function(err, products){
+   .exec(async function(err, products){
        if(err){
            return next(err)
        }
@@ -130,8 +129,12 @@ function search(req,res,next){
                msg: 'No Products Found'
            })
        }
-       console.log(products)
-       res.status(200).json(products)
+
+     
+       res.status(200).json({
+           products,
+           count
+       })
    })
 
 }
