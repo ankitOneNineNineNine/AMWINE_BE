@@ -1,5 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const reviewSchema = new Schema(
+    {
+    rating: Number,
+    text: String,
+    addedBy: {
+     type: Schema.Types.ObjectId,
+     ref: "user",
+    }
+    },
+    {timestamps:true}
+    );
+
 
 const productSchema = new Schema(
 {
@@ -15,9 +27,7 @@ quantity: {
     type: Number,
     required:true
 },
-in_stock:{
-    type:Number,
-},
+reviews: [reviewSchema],
 pType: {
 type:String,
 enum: ["wine", "beer"],

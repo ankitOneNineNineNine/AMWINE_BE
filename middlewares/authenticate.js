@@ -9,16 +9,27 @@ module.exports = function (req,res,next){
     ? req.query.token
     : null;
 
-    if(token){
+  if(!token){
+      return next({
+          msg: 'Please Login First'
+      })
+  }
+    else{
+      
         jwt.verify(token, config.jwtSecret, function(err, hash){
-            let u_id = hash.i_hash;
-            userModel.findById(u_id)
+            
+            userModel.findById(hash.i_hash)
             .then(user=>{
                 req.loggedInUser = user;
                 next()
             })
-            .catch(err=>next(err))
+            .catch(err=>next({
+                msg: 'Please Login With Valid Credentials'
+            }))
         })
-             }
+    }
+          
+          
+        
 
 }

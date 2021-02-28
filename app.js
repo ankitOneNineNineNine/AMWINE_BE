@@ -8,8 +8,7 @@ var adminAuth = require('./routes/Admin/admin.auth.route');
 var userRoute = require('./routes/User/user.route')
 require('./db')
 var cors = require('cors');
-const publicProductRoute = require('./routes/Product/product.public.route')
-const privateProductRoute = require('./routes/Product/product.private.route')
+const productRoute = require('./routes/Product/product.route')
 const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize')
@@ -35,8 +34,8 @@ app.use('/adminAuth',adminAuth )
 app.use('/user', authenticate, userRoute)
 
 //productRoute
-app.use('/product', publicProductRoute)
-app.use('/authProduct', authenticate, secondaryAuthorization, privateProductRoute)
+app.use('/product', productRoute)
+
 
 
 // catch 404 and forward to error handler

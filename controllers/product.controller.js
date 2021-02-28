@@ -138,7 +138,56 @@ async function search(req,res,next){
    })
 
 }
+function getVariety(req,res,next){
+    productModel.find({})
+    .exec(function(err, products){
+        if(err){
+            return next(err)
+        }
+        if(!products){
+            return next({
+                msg: 'No Products Found'
+            })
+        }
+ 
+        let varieties = []; 
+        products.forEach(p=>{
+            if(varieties.indexOf(p.variety)<0){
+                varieties.push(p.variety)
+            }
+        })
+        console.log(varieties)
+        res.status(200).json(varieties)
+    })
+}
+function postReview(req,res,next){
+ 
+let addedBy = req.loggedInUser._id;
+let text = req.body.text;
+let rating = req.body.rating;
 
+
+
+productModel.findByIdAndUpdate(req.body.pId, {
+    reviews: {
+        addedBy,
+        text,
+        rating
+    }
+}, {new: true}, function(err, updatedProduct){
+    if(err){
+        return next(err);
+    }
+    res.status(200).json(updatedProduct)
+})
+
+
+}
+function getReview(req,res,next){
+
+}
 module.exports = {
-    getAll, getById,add, update, search,searchLatest
+    getAll, getById,add, update, search,searchLatest, getVariety,
+    postReview,
+    getReview,
 }
