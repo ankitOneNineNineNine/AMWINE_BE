@@ -13,6 +13,8 @@ const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize')
 
+const publicUserRoute = require('./routes/User/public.user.route')
+
 var app = express();
 
 app.use(cors())
@@ -31,7 +33,8 @@ app.use('/auth', authRouter)
 app.use('/adminAuth',adminAuth )
 
 //userRoute
-app.use('/user', authenticate, userRoute)
+app.use('/user', authenticate, userRoute);
+app.use('/userDetails',publicUserRoute )
 
 //productRoute
 app.use('/product', productRoute)

@@ -54,7 +54,6 @@ function add(req,res,next){
     newProduct.addedBy = req.loggedInUser._id;
     newProduct.save()
     .then(product=>{
-        console.log(product)
         res.status(200).json(product)
     })
     .catch(err=>{
@@ -166,28 +165,33 @@ let addedBy = req.loggedInUser._id;
 let text = req.body.text;
 let rating = req.body.rating;
 
-
-
-productModel.findByIdAndUpdate(req.body.pId, {
-    reviews: {
-        addedBy,
-        text,
-        rating
-    }
-}, {new: true}, function(err, updatedProduct){
+productModel.findById(req.body.pId)
+.exec(function(err, product){
     if(err){
         return next(err);
     }
-    res.status(200).json(updatedProduct)
+    if(!product){
+        return next({
+            msg: 'No product available for review'
+        })
+    }
+    product.reviews = [ {
+        addedBy,
+        text,
+        rating
+    }, ...product.reviews]
+    product.save()
+    .then(function(product){
+        res.status(200).json(product)
+    })
+    .catch(err=>next(err))
 })
 
 
-}
-function getReview(req,res,next){
 
 }
+
 module.exports = {
     getAll, getById,add, update, search,searchLatest, getVariety,
     postReview,
-    getReview,
 }

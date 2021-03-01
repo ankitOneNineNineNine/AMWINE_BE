@@ -1,4 +1,4 @@
-const { getAll, getById , search, searchLatest, getVariety, postReview, getReview, add} = require('../../controllers/product.controller');
+const { getAll, getById , search, searchLatest, getVariety, postReview, add} = require('../../controllers/product.controller');
 const authenticate = require('../../middlewares/authenticate');
 const { secondaryAuthorization } = require('../../middlewares/authorize');
 const uploadProductImages = require('../../middlewares/upload.product');
@@ -22,7 +22,7 @@ router.get('/pr/varieties', getVariety)
 router.route('/review')
 .all(authenticate)
 .post(postReview)
-.get(getReview)
+
 
 router.route('/:id')
 .get(getById)
