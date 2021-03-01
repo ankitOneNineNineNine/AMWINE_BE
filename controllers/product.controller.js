@@ -85,8 +85,14 @@ function searchLatest(req,res,next){
          res.status(200).json(products)
      })
 }
-async function getTotal(filter){
-    return await productModel.find(filter).count();
+async function getTotal(filter, name){
+    let pC = await productModel.find(filter);
+    if(name && name.length){
+        return pC.filter(product=>product.name.toLowerCase().includes(name.toLowerCase())).length;
+    }
+    else{
+        return pC.length;
+    }
 }
 async function search(req,res,next){
     let{min,name, max, type,variety,pageNumber,itemsToShow} = req.body;
@@ -101,19 +107,14 @@ async function search(req,res,next){
     }
     let queryModel;
 
-    const filter = name.length? {
-        name: name,
+    const filter = {
         pType: { $in: type },
         variety: { $in: variety },
         price: {$gte: min, $lte: max} 
      }
-     : {
-        pType: { $in: type },
-        variety: { $in: variety },
-        price: {$gte: min, $lte: max} 
-     }
-     let count =await getTotal(filter);
-        queryModel =  productModel.find(filter)
+     let count =await getTotal(filter, name);
+
+     queryModel =  productModel.find(filter)
     
    queryModel
    .sort({updatedAt:-1})
@@ -129,6 +130,9 @@ async function search(req,res,next){
            })
        }
 
+       if(name && name.length){
+        products = products.filter(product=>product.name.toLowerCase().includes(name.toLowerCase()))
+       }
      
        res.status(200).json({
            products,
@@ -155,7 +159,6 @@ function getVariety(req,res,next){
                 varieties.push(p.variety)
             }
         })
-        console.log(varieties)
         res.status(200).json(varieties)
     })
 }

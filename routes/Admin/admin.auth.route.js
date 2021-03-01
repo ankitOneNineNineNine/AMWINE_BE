@@ -47,11 +47,10 @@ const user = require('../../models/user.model');
 router.route('/addSecondaryAdmin')
 .post(function(req,res,next){
   let newSAdmin = new userModel({})
-  let {userName, fullName, email, password, number} = req.body;
-  newSAdmin.role = "ADMIN_S"
+  let {userName, fullName,role, email, password} = req.body;
+  newSAdmin.role = role;
   newSAdmin.userName = userName;
   newSAdmin.email = email;
-  newSAdmin.number = number;
   newSAdmin.fullName = fullName;
   bcrypt.hash(password, 15, function(err, hash) {
     if(err){
