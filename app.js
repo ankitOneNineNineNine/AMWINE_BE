@@ -32,7 +32,7 @@ app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
 //auth route
 
 app.use('/auth', authRouter)
-app.use('/adminAuth',adminAuth )
+app.use('/adminAuth',authenticate, adminAuth )
 
 //userRoute
 app.use('/user', authenticate, userRoute);

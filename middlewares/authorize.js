@@ -1,6 +1,6 @@
 function primaryAuthorization(req,res,next){
     let user = req.loggedInUser;
-    if(user && user.role === 'ADMIN_P'){
+   if(user && user.role === 'ADMIN_P'){
         req.pAuthorized = true;    
         next()
         }

@@ -6,6 +6,41 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const user = require('../../models/user.model');
 
+//adminSignup
+
+router.route('/adminLogin')
+.post(function(req,res,next){
+  let admin = new userModel({})
+  let {userName, fullName, email, password, number} = req.body;
+  admin.role = "ADMIN_P"
+  admin.userName = userName;
+  admin.email = email;
+  admin.number = number;
+  admin.fullName = fullName;
+  bcrypt.hash(password, 15, function(err, hash) {
+    if(err){
+      return next(err)
+    }
+    if(hash){
+      admin.password = hash;
+      admin.save()
+      .then(user=>{
+       
+        res.status(200).json({
+          user
+        })
+           
+  
+     
+      })
+      .catch(err=>{
+          next(err)
+      })
+    }
+});
+})
+
+
 
 //routes
 router.route('/signup')
