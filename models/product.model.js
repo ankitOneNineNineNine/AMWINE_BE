@@ -27,6 +27,9 @@ quantity: {
     type: Number,
     required:true
 },
+sold: {
+    type: Number,
+},
 reviews: [reviewSchema],
 pType: {
 type:String,
