@@ -14,11 +14,14 @@ const productRoute = require('./routes/Product/product.route')
 const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize')
-
+const redis = require('redis');
 
 var app = express();
 
-app.use(cors())
+app.use(cors());
+
+
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -28,6 +31,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use("/ProfilePictures", express.static(path.join(__dirname, 'ProfilePictures')));
 app.use("/ProductImages", express.static(path.join(__dirname, 'ProductImages')));
 app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
+
+//redis
+const redisPort = 6379;
+const client = redis.createClient(redisPort);
+client.on("error", function(err){
+  console.log(err)
+})
 
 //auth route
 

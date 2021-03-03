@@ -63,7 +63,10 @@ router.route('/signup')
           {
            i_hash: user._id
           },
-          config.jwtSecret
+          config.jwtSecret, 
+          {
+            expiresIn: '1m'
+          }
         );
         res.status(200).json({
           token,
@@ -133,7 +136,10 @@ router.route('/signin')
       {
        i_hash: user._id
       },
-      config.jwtSecret
+      config.jwtSecret,
+      {
+        expiresIn: '1m'
+      }
     );
     res.status(200).json({
       token,
