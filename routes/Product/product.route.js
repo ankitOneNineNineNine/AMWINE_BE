@@ -10,7 +10,7 @@ const router = require('express').Router();
 router.route('/')
 .all(authenticate, secondaryAuthorization)
 .post(uploadProductImages.array('images'),add)
-.put(update)
+
 .get(getAll)
 
 router.route('/search')
@@ -26,6 +26,7 @@ router.route('/review')
 
 router.route('/:id')
 .get(getById)
+.put(authenticate, secondaryAuthorization, uploadProductImages.array('images'),update)
 
 
 module.exports = router;

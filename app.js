@@ -13,7 +13,8 @@ var cors = require('cors');
 const productRoute = require('./routes/Product/product.route')
 const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
-const {primaryAuthorization} = require('./middlewares/authorize')
+const {primaryAuthorization} = require('./middlewares/authorize');
+const boughtRoute = require('./routes/Bought/bought.route')
 const redis = require('redis');
 
 var app = express();
@@ -33,6 +34,7 @@ app.use("/ProductImages", express.static(path.join(__dirname, 'ProductImages')))
 app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
 
 
+
 //auth route
 
 app.use('/auth', authRouter)
@@ -45,8 +47,11 @@ app.use('/userDetails',publicUserRoute )
 //productRoute
 app.use('/product', productRoute)
 
-//postRoute
+//adRoute
 app.use('/ad', postRoute);
+
+//boughtRoute
+app.use('/bought', authenticate, boughtRoute )
 
 
 // catch 404 and forward to error handler

@@ -2,6 +2,7 @@
 const product = require('../models/product.model')
 const productModel = require('../models/product.model')
 const moment = require('moment');
+const fs =  require('fs');
 function getAll(req,res,next){
   let {pageNumber, itemsToShow} = req.body
         productModel.find({})
@@ -61,7 +62,59 @@ function add(req,res,next){
     })
 }
 function update(req,res,next){
- 
+    let productId = req.params.id;
+    productModel.findById(productId)
+    .exec(function(err,product){
+        if(err)  return next(err);
+        if(!product) return next({msg: 'product not active'});
+        let {name, price, quantity, variety, pType, imageRemoval } = req.body;
+        if(name) product.name = name;
+        if(price) product.price = price;
+        if(quantity) product.quantity = quantity;
+        if(variety) product.variety = variety;
+        if(pType) product.pType = pType;
+        if(imageRemoval.length){
+            imageRemoval.forEach(image=>{
+               fs.unlinkSync(`../ProductImages/${image}`)
+            })
+        }
+        let images = [];
+        if(req.files){
+            req.files.forEach(file=>{
+             
+                let fileName = file.filename;
+                images.push(fileName);
+                images.forEach(image=>{
+                    newProduct.images.push(image)
+                })
+            })
+        }
+    })
+    
+    let images = [];
+    if(req.files){
+        req.files.forEach(file=>{
+         
+            let fileName = file.filename;
+            images.push(fileName);
+        })
+    }
+    newProduct.name = name;
+    newProduct.price = price;
+    newProduct.quantity = quantity;
+    images.forEach(image=>{
+        newProduct.images.push(image)
+    })
+    newProduct.pType = pType;
+    newProduct.variety = variety;
+    newProduct.addedBy = req.loggedInUser._id;
+    newProduct.save()
+    .then(product=>{
+        res.status(200).json(product)
+    })
+    .catch(err=>{
+        return next(err)
+    })
 }
 function searchLatest(req,res,next){
     let today = moment(new Date()).format('YYYY-MM-DD[T00:00:00.000Z]');
