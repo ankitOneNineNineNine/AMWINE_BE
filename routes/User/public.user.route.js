@@ -14,7 +14,7 @@ router.get('/:id', function(req,res,next){
                 msg: 'This user is no more in this application'
             })
         }
-        console.log(user)
+     
         let userToShow = {
             image: user.image,
             fullName: user.fullName

@@ -32,12 +32,6 @@ app.use("/ProfilePictures", express.static(path.join(__dirname, 'ProfilePictures
 app.use("/ProductImages", express.static(path.join(__dirname, 'ProductImages')));
 app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
 
-//redis
-const redisPort = 6379;
-const client = redis.createClient(redisPort);
-client.on("error", function(err){
-  console.log(err)
-})
 
 //auth route
 

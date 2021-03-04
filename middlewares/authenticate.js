@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const client = require('../app');
 const config = require('../config');
 const userModel = require('../models/user.model')
 
@@ -15,9 +16,8 @@ module.exports = function (req,res,next){
       })
   }
     else{
-     
+ 
         jwt.verify(token, config.jwtSecret, function(err, hash){
-            
             userModel.findById(hash.i_hash)
             .then(user=>{
              

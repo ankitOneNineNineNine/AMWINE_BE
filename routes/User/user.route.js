@@ -44,7 +44,7 @@ router.route('/')
     updatedUser.address = address;
   }
  if(cart){
-   console.log(cart, req.body.action)
+ 
    if(req.body.action === 'add'){
      updatedUser.cart.push(cart)
    }

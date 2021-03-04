@@ -5,10 +5,11 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const user = require('../../models/user.model');
+const client = require('../../app');
 
 //adminSignup
 
-router.route('/adminLogin')
+router.route('/adminSignup')
 .post(function(req,res,next){
   let admin = new userModel({})
   let {userName, fullName, email, password, number} = req.body;
@@ -64,10 +65,8 @@ router.route('/signup')
            i_hash: user._id
           },
           config.jwtSecret, 
-          {
-            expiresIn: '1m'
-          }
         );
+
         res.status(200).json({
           token,
           user
@@ -137,10 +136,9 @@ router.route('/signin')
        i_hash: user._id
       },
       config.jwtSecret,
-      {
-        expiresIn: '1m'
-      }
     );
+    
+    
     res.status(200).json({
       token,
       user

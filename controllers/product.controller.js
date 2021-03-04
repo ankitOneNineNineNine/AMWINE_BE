@@ -38,7 +38,7 @@ function add(req,res,next){
     let images = [];
     if(req.files){
         req.files.forEach(file=>{
-            console.log(file)
+         
             let fileName = file.filename;
             images.push(fileName);
         })
@@ -61,7 +61,7 @@ function add(req,res,next){
     })
 }
 function update(req,res,next){
-    console.log(req.body)
+ 
 }
 function searchLatest(req,res,next){
     let today = moment(new Date()).format('YYYY-MM-DD[T00:00:00.000Z]');
