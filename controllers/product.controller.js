@@ -3,6 +3,7 @@ const product = require('../models/product.model')
 const productModel = require('../models/product.model')
 const moment = require('moment');
 const fs =  require('fs');
+const path = require('path')
 function getAll(req,res,next){
   let {pageNumber, itemsToShow} = req.body
         productModel.find({})
@@ -63,19 +64,24 @@ function add(req,res,next){
 }
 function update(req,res,next){
     let productId = req.params.id;
+  
     productModel.findById(productId)
-    .exec(function(err,product){
+    .exec(function(err,oproduct){
         if(err)  return next(err);
-        if(!product) return next({msg: 'product not active'});
-        let {name, price, quantity, variety, pType, imageRemoval } = req.body;
-        if(name) product.name = name;
-        if(price) product.price = price;
-        if(quantity) product.quantity = quantity;
-        if(variety) product.variety = variety;
-        if(pType) product.pType = pType;
-        if(imageRemoval.length){
-            imageRemoval.forEach(image=>{
-               fs.unlinkSync(`../ProductImages/${image}`)
+        if(!oproduct) return next({msg: 'product not active'});
+        let {name, price, quantity, variety, pType, removeImage } = req.body;
+        let updatedProduct = oproduct;
+        if(name) updatedProduct.name = name;
+        if(price) updatedProduct.price = +price;
+        if(quantity) updatedProduct.quantity = +quantity;
+        if(variety) updatedProduct.variety = variety;
+        if(pType) updatedProduct.pType = pType;
+        if(removeImage && removeImage.length){
+            removeImage.forEach(image=>{
+                let urlPath = path.join(__dirname, `../ProductImages/${image}`)
+                console.log(urlPath)
+               fs.unlinkSync(urlPath);
+               updatedProduct.images.splice(updatedProduct.images.indexOf(image),1);
             })
         }
         let images = [];
@@ -85,36 +91,21 @@ function update(req,res,next){
                 let fileName = file.filename;
                 images.push(fileName);
                 images.forEach(image=>{
-                    newProduct.images.push(image)
+                    updatedProduct.images = [...updatedProduct.images, images]
                 })
             })
         }
-    })
-    
-    let images = [];
-    if(req.files){
-        req.files.forEach(file=>{
-         
-            let fileName = file.filename;
-            images.push(fileName);
+        updatedProduct.save()
+        .then(pr=>{
+            res.status(200).json(pr)
         })
-    }
-    newProduct.name = name;
-    newProduct.price = price;
-    newProduct.quantity = quantity;
-    images.forEach(image=>{
-        newProduct.images.push(image)
+        .catch(err=>{
+            console.log(err)
+            return next(err)
+        })
     })
-    newProduct.pType = pType;
-    newProduct.variety = variety;
-    newProduct.addedBy = req.loggedInUser._id;
-    newProduct.save()
-    .then(product=>{
-        res.status(200).json(product)
-    })
-    .catch(err=>{
-        return next(err)
-    })
+  
+ 
 }
 function searchLatest(req,res,next){
     let today = moment(new Date()).format('YYYY-MM-DD[T00:00:00.000Z]');
@@ -149,15 +140,19 @@ async function getTotal(filter, name){
 }
 async function search(req,res,next){
     let{min,name, max, type,variety,pageNumber,itemsToShow} = req.body;
-    if(!type.length){
+    if(!min){
+        min = 0
+    }
+    if(!type || !type.length){
         type = ['wine', 'beer']
     }
     if(!max || max === 0){
         max = 15000
     }
-    if(!variety.length){
+    if(!variety|| !variety.length){
         variety = ["Chardonnay","Sparkle", "Booze", "Red"]
     }
+    
     let queryModel;
 
     const filter = {
@@ -166,10 +161,9 @@ async function search(req,res,next){
         price: {$gte: min, $lte: max} 
      }
      let count =await getTotal(filter, name);
+     
 
-     queryModel =  productModel.find(filter)
-    
-   queryModel
+    productModel.find(filter)
    .sort({updatedAt:-1})
    .skip((pageNumber-1)*itemsToShow)
    .limit(+itemsToShow)
@@ -182,11 +176,12 @@ async function search(req,res,next){
                msg: 'No Products Found'
            })
        }
+   
 
        if(name && name.length){
         products = products.filter(product=>product.name.toLowerCase().includes(name.toLowerCase()))
+        count = products.length;
        }
-     
        res.status(200).json({
            products,
            count

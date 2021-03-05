@@ -54,6 +54,8 @@ app.use('/ad', postRoute);
 app.use('/bought', authenticate, boughtRoute )
 
 
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 const boughtModel = require('../../models/bought.model');
-
+const productModel = require('../../models/product.model')
 router.route('/')
 .get(function(req,res,next){
     boughtModel.find({})
@@ -31,7 +31,24 @@ router.route('/')
     newBought.shippingCharge = shippingCharge;
 
     newBought.save()
-    .then(boughtDetails =>res.status(200).json(boughtDetails))
+    .then(async boughtDetails =>{
+        let cUser = req.loggedInUser;
+        cUser.bought = boughtDetails._id;
+        boughtDetails.products.forEach(product=>{
+
+            let productId = product.product;
+            cUser.cart.splice(cUser.cart.indexOf(productId), 1);
+            let quantity = product.quantity;
+            productModel.findById(productId)
+            .then(async product=>{
+                product.sold = quantity;
+                product.quantity = product.quantity - quantity;
+                await product.save();
+            })
+        })
+    await cUser.save();
+    res.status(200).json("Mail is Sent to your Email!!");
+    })
     .catch(err=>{
         console.log(err)
     })

@@ -32,6 +32,10 @@ number:Number,
 cart: [{
     type: Schema.Types.ObjectId,
     ref: 'wine'
+}],
+bought: [{
+    type: Schema.Types.ObjectId,
+    ref: 'bought'
 }]
 },
 {timestamps:true}

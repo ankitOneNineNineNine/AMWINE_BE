@@ -16,7 +16,6 @@ module.exports = function (req,res,next){
       })
   }
     else{
- 
         jwt.verify(token, config.jwtSecret, function(err, hash){
             userModel.findById(hash.i_hash)
             .then(user=>{

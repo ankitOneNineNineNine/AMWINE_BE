@@ -11,7 +11,7 @@ const boughtSchema = new Schema({
        {
            product: {
                type: Schema.Types.ObjectId,
-               ref: 'wines'
+               ref: 'wine'
            },
            quantity: Number,
        }

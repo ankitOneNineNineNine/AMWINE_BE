@@ -1,8 +1,8 @@
-const { getAll, getById , search, searchLatest, getVariety, postReview, add} = require('../../controllers/product.controller');
+const { getAll, getById , search, update, searchLatest, getVariety, postReview, add} = require('../../controllers/product.controller');
 const authenticate = require('../../middlewares/authenticate');
 const { secondaryAuthorization } = require('../../middlewares/authorize');
 const uploadProductImages = require('../../middlewares/upload.product');
-const { update } = require('../../models/user.model');
+
 
 const router = require('express').Router();
 
@@ -10,7 +10,6 @@ const router = require('express').Router();
 router.route('/')
 .all(authenticate, secondaryAuthorization)
 .post(uploadProductImages.array('images'),add)
-
 .get(getAll)
 
 router.route('/search')
