@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const user = require('../../models/user.model');
-const client = require('../../app');
+
 
 //adminSignup
 
@@ -66,13 +66,14 @@ router.route('/signup')
           },
           config.jwtSecret, 
         );
+        // client.set(token, user._id);
 
         res.status(200).json({
           token,
           user
         })
            
-  
+     
      
       })
       .catch(err=>{
@@ -84,16 +85,9 @@ router.route('/signup')
 
 router.route('/signin')
 .post(function(req,res,next){
-  let {eoru, password,token} = req.body;
+  let {eoru, password} = req.body;
 
-  let id;
-  if(token){
-    jwt.verify(token, config.jwtSecret, function(err, hash){
- 
-    id = hash.i_hash
-    })
-  }
- 
+
   userModel.findOne({
     $or: [
       {
@@ -102,25 +96,10 @@ router.route('/signin')
       {
         userName: req.body.eoru,
       },
-      {
-        _id: id
-      }
     ],
   }).then(user=>{
-   
-    if(!user){
-      return next({
-        msg: "User doesn't exist"
-      })
-    }
-    if(token){
-      res.status(200).json({
-        token,
-        user
-      })
-    }
-    else{
-  bcrypt.compare(password, user.password, function(err,result){
+
+    bcrypt.compare(password, user.password, function(err,result){
     if(err){
       return next(err)
     }
@@ -147,7 +126,7 @@ router.route('/signin')
   })
 
 
-}
+
   })
   .catch(err=>next(err))
 

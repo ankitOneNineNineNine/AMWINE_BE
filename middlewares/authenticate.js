@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-const client = require('../app');
+
 const config = require('../config');
 const userModel = require('../models/user.model')
-
+const client = require('../app').client;
 module.exports = function (req,res,next){
     var token = req.headers["authorization"]
     ? req.headers["authorization"]
@@ -10,12 +10,14 @@ module.exports = function (req,res,next){
     ? req.query.token
     : null;
 
+    console.log(client)
+  
   if(!token){
       return next({
           msg: 'Please Login First'
       })
   }
-    else{
+ else{
         jwt.verify(token, config.jwtSecret, function(err, hash){
             userModel.findById(hash.i_hash)
             .then(user=>{

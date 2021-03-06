@@ -15,7 +15,20 @@ const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize');
 const boughtRoute = require('./routes/Bought/bought.route')
-const redis = require('redis');
+const redis = require("redis");
+
+
+
+const client = redis.createClient({
+    host: 'localhost',
+    port: 6379
+  })
+client.on("connect", function(){
+    console.log("Connected to Redis Client")
+})
+
+
+
 
 var app = express();
 
@@ -72,3 +85,6 @@ app.use(function(err, req, res, next) {
 app.listen(8000, ()=>{
   console.log('Connected to 8000')
 })
+
+
+module.exports = {client:client};

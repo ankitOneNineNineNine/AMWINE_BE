@@ -5,12 +5,13 @@ const moment = require('moment');
 const fs =  require('fs');
 const path = require('path')
 function getAll(req,res,next){
-  let {pageNumber, itemsToShow} = req.body
+  let {pageNumber, itemsToShow} = req.query
+
         productModel.find({})
-        .sort({updatedAt:-1})
+        .sort({sold: -1})
         .skip((pageNumber-1)*itemsToShow)
         .limit(+itemsToShow)
-       .exec(function(err, products){
+       .exec(async function(err, products){
         if(err){
             return next(err)
         }
@@ -19,7 +20,12 @@ function getAll(req,res,next){
                 msg: 'No Products Found'
             })
         }
-        res.status(200).json(products)
+        let count = await getTotal({}, "");
+        console.log(count)
+        res.status(200).json({
+            products,
+            count
+        })
        })
 
 }
@@ -107,6 +113,7 @@ function update(req,res,next){
   
  
 }
+
 function searchLatest(req,res,next){
     let today = moment(new Date()).format('YYYY-MM-DD[T00:00:00.000Z]');
     let reqdate = moment().add(-5, 'days').format('YYYY-MM-DD[T00:00:00.000Z]');
