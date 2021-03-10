@@ -25,7 +25,6 @@ router.route('/')
     })
 
     let newBought = new boughtModel({})
-    newBought.user = user;
     newBought.products = products;
     newBought.subTotal = subTotal;
     newBought.shippingCharge = shippingCharge;
@@ -33,7 +32,7 @@ router.route('/')
     newBought.save()
     .then(async boughtDetails =>{
         let cUser = req.loggedInUser;
-        cUser.bought = boughtDetails._id;
+        cUser.bought.push(boughtDetails._id);
         boughtDetails.products.forEach(product=>{
 
             let productId = product.product;

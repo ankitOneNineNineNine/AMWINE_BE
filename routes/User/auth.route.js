@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const user = require('../../models/user.model');
-
+const redisClient = require('../../databases/redis.db')
 
 //adminSignup
 
@@ -97,39 +97,42 @@ router.route('/signin')
         userName: req.body.eoru,
       },
     ],
-  }).then(user=>{
-
-    bcrypt.compare(password, user.password, function(err,result){
+  })
+  .exec(function(err, user){
     if(err){
       return next(err)
     }
-
-   if(!result){
-       return next({
-         msg: 'Incorrect Password'
-       })
+    if(!user){
+      return next({
+        msg: "Email or password incorrect"
+      })
     }
-
-    var token = jwt.sign(
-      {
-       i_hash: user._id
-      },
-      config.jwtSecret,
-    );
-    
-    
-    res.status(200).json({
-      token,
-      user
-    })
+    bcrypt.compare(password, user.password, function(err,result){
+      if(err){
+        return next(err)
+      }
   
+     if(!result){
+         return next({
+           msg: 'Incorrect Password'
+         })
+      }
+  
+      var token = jwt.sign(
+        {
+         i_hash: user._id
+        },
+        config.jwtSecret,
+      );
+     redisClient.set(token, JSON.stringify(user._id));
+      res.status(200).json({
+        token,
+        user
+      })
+    
   })
 
-
-
-  })
-  .catch(err=>next(err))
-
+})
 })
 router.route('/')
 .get(function(req,res,next){
@@ -141,7 +144,10 @@ router.route('/')
   })
 
 })
-
+router.post('/logout', function(req,res,next){
+  redisClient.del(req.body.token);
+  res.status(200).json("Logged Out");
+})
 router.route('/forgot-password')
 .post(function(req,res,next){
   console.log(req.body)

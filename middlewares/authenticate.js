@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const config = require('../config');
 const userModel = require('../models/user.model')
-const client = require('../app').client;
+const redisClient = require('../databases/redis.db')
+
 module.exports = function (req,res,next){
     var token = req.headers["authorization"]
     ? req.headers["authorization"]
@@ -10,7 +11,6 @@ module.exports = function (req,res,next){
     ? req.query.token
     : null;
 
-    console.log(client)
   
   if(!token){
       return next({
@@ -18,17 +18,30 @@ module.exports = function (req,res,next){
       })
   }
  else{
-        jwt.verify(token, config.jwtSecret, function(err, hash){
-            userModel.findById(hash.i_hash)
-            .then(user=>{
-             
-                req.loggedInUser = user;
-                next()
-            })
-            .catch(err=>next({
-                msg: 'Please Login With Valid Credentials'
-            }))
+        console.log(token)
+        redisClient.get(token, function(err, id){
+            if (err) {
+                return next(err)
+            }
+            console.log("inside", token, id)
+            if(id){
+                userModel.findById(JSON.parse(id))
+                .then(user=>{
+                    
+                    req.loggedInUser = user;
+                    next()
+                })
+                .catch(err=>next({
+                    msg: 'Please Login With Valid Credentials'
+                }))
+            }
+            else{
+               return next({
+                    msg: "You are not logged in!"
+                })
+            }
         })
+
     }
           
           

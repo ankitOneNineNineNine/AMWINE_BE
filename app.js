@@ -8,25 +8,13 @@ var adminAuth = require('./routes/Admin/admin.auth.route');
 var userRoute = require('./routes/User/user.route');
 const publicUserRoute = require('./routes/User/public.user.route');
 const postRoute = require('./routes/Ad/ad.route');
-require('./db')
+require('./databases/mongo.db')
 var cors = require('cors');
 const productRoute = require('./routes/Product/product.route')
 const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize');
 const boughtRoute = require('./routes/Bought/bought.route')
-const redis = require("redis");
-
-
-
-const client = redis.createClient({
-    host: 'localhost',
-    port: 6379
-  })
-client.on("connect", function(){
-    console.log("Connected to Redis Client")
-})
-
 
 
 
@@ -86,5 +74,3 @@ app.listen(8000, ()=>{
   console.log('Connected to 8000')
 })
 
-
-module.exports = {client:client};

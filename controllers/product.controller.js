@@ -21,7 +21,7 @@ function getAll(req,res,next){
             })
         }
         let count = await getTotal({}, "");
-        console.log(count)
+      
         res.status(200).json({
             products,
             count
@@ -85,7 +85,7 @@ function update(req,res,next){
         if(removeImage && removeImage.length){
             removeImage.forEach(image=>{
                 let urlPath = path.join(__dirname, `../ProductImages/${image}`)
-                console.log(urlPath)
+               
                fs.unlinkSync(urlPath);
                updatedProduct.images.splice(updatedProduct.images.indexOf(image),1);
             })
@@ -145,6 +145,27 @@ async function getTotal(filter, name){
         return pC.length;
     }
 }
+function getAllVariety(){
+   return new Promise((resolve, reject)=>{
+    productModel.find({})
+    .exec(function(err, products){
+        if(err) reject([]);
+        if (!products) reject([]);
+        
+        let varieties = []; 
+        
+        products.forEach(p=>{
+            if(varieties.indexOf(p.variety)<0){
+                varieties.push(p.variety)
+            }
+        })
+       
+       
+        resolve(varieties);
+        
+    })
+   })
+}
 async function search(req,res,next){
     let{min,name, max, type,variety,pageNumber,itemsToShow} = req.body;
     if(!min){
@@ -157,16 +178,19 @@ async function search(req,res,next){
         max = 15000
     }
     if(!variety|| !variety.length){
-        variety = ["Chardonnay","Sparkle", "Booze", "Red"]
+        
+         variety = await getAllVariety();
+      
     }
     
     let queryModel;
-
+    
     const filter = {
         pType: { $in: type },
         variety: { $in: variety },
         price: {$gte: min, $lte: max} 
      }
+  
      let count =await getTotal(filter, name);
      
 
@@ -184,7 +208,7 @@ async function search(req,res,next){
            })
        }
    
-
+     
        if(name && name.length){
         products = products.filter(product=>product.name.toLowerCase().includes(name.toLowerCase()))
         count = products.length;
@@ -196,26 +220,9 @@ async function search(req,res,next){
    })
 
 }
-function getVariety(req,res,next){
-    productModel.find({})
-    .exec(function(err, products){
-        if(err){
-            return next(err)
-        }
-        if(!products){
-            return next({
-                msg: 'No Products Found'
-            })
-        }
- 
-        let varieties = []; 
-        products.forEach(p=>{
-            if(varieties.indexOf(p.variety)<0){
-                varieties.push(p.variety)
-            }
-        })
-        res.status(200).json(varieties)
-    })
+async function getVariety(req,res,next){
+   let varieties = await getAllVariety();
+   res.status(200).json(varieties)
 }
 function postReview(req,res,next){
  
