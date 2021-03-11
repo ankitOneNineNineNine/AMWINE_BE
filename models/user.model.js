@@ -36,7 +36,9 @@ cart: [{
 bought: [{
     type: Schema.Types.ObjectId,
     ref: 'bought'
-}]
+}],
+passwordResetToken: String,
+passwordResetExpiry: String,
 },
 {timestamps:true}
 )

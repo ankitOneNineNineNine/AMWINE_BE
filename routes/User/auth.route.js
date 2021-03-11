@@ -5,8 +5,9 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const user = require('../../models/user.model');
-const redisClient = require('../../databases/redis.db')
-
+const redisClient = require('../../databases/redis.db');
+const mailSend = require('../../middlewares/mail.send')
+const randomString = require("randomstring");
 //adminSignup
 
 router.route('/adminSignup')
@@ -26,7 +27,6 @@ router.route('/adminSignup')
       admin.password = hash;
       admin.save()
       .then(user=>{
-       
         res.status(200).json({
           user
         })
@@ -66,12 +66,17 @@ router.route('/signup')
           },
           config.jwtSecret, 
         );
-        // client.set(token, user._id);
+        
 
-        res.status(200).json({
-          token,
-          user
-        })
+        redisClient.set(token, JSON.stringify(user._id), function(err, reply){
+          if(err){
+            return next(err)
+          }
+          res.status(200).json({
+           token,
+           user
+         })
+        });
            
      
      
@@ -124,11 +129,19 @@ router.route('/signin')
         },
         config.jwtSecret,
       );
-     redisClient.set(token, JSON.stringify(user._id));
-      res.status(200).json({
+     redisClient.set(token, `${user._id}`, function(err, reply){
+       if(err){
+         console.log(err)
+         return next(err)
+       }
+       console.log(reply)
+       res.status(200).json({
         token,
         user
       })
+     });
+     
+   
     
   })
 
@@ -148,10 +161,79 @@ router.post('/logout', function(req,res,next){
   redisClient.del(req.body.token);
   res.status(200).json("Logged Out");
 })
-router.route('/forgot-password')
-.post(function(req,res,next){
-  console.log(req.body)
 
-})
 
+router.route("/forgot-password").post(function (req, res, next) {
+ 
+  userModel.findOne({
+    $or: [
+      {
+        email: req.body.eoru,
+      },
+      {
+        userName: req.body.eoru,
+      },
+    ],
+  })
+    .then((user) => {
+      
+      var passwordResetToken = randomString.generate(25);
+      var passwordResetExpiry = new Date(Date.now(1000 * 60 * 60 * 24));
+      let link = `${req.headers.origin}/reset-password/${passwordResetToken}`;
+      var mailData = {
+        subject: "Password Recovery",
+        html:  `
+        <p>Hi <strong>${user.userName}, </strong></p>
+        <p>We noticed that you are having problem logging into our website.
+        Please click the link given below to reset your password.
+        </p>
+        <p>Click on this link <a href = ${link}>here</a> to reset your password. </p>
+        <p>Please note that this link will only sustain to work for 24 hours.</p>
+        <p>If you did not send the request please contact the customer support for the possibility of intrusion </p>
+        <p>Regards, </p>
+        <p>AMWINE SHOP</p>
+        `,
+        email: user.email,
+      };
+
+      var mailContent = mailSend.prepareMail(mailData);
+     
+      user.passwordResetToken = passwordResetToken;
+      user.passwordResetExpiry = passwordResetExpiry;
+      user.save(function (err, saved) {
+          if (err) return next(err);
+          else {
+            mailSend.sender.sendMail(mailContent, function (err, sent) {
+              if (err) return next(err);
+              else res.status(200).json(sent);
+            });
+          }
+        });
+    })
+    .catch((err) => next({ msg: "user not found" }));
+});
+
+router.route("/reset-password/:token").post(function (req, res, next) {
+  var passResetToken = req.params.token;
+
+  userModel
+    .findOne({
+      passwordResetToken: passResetToken,
+      passwordResetExpiry: {
+        $lte: new Date() ,
+      },
+    })
+    .exec(function (err, user) {
+      if (err) return next(err);
+      if (!user) return next({ msg: "invalid token" });
+
+      user.password = bcrypt.hashSync(req.body.password, 10);
+      user.passwordResetToken = null;
+      user.passwordResetExpiry = null;
+      user.save(function (err, reset) {
+        if (err) return next(err);
+        else res.status(200).json("Resetted");
+      });
+    });
+});
 module.exports = router;
