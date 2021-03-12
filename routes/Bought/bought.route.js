@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const createReceipt = require('../../middlewares/pdf.create');
 const boughtModel = require('../../models/bought.model');
 const productModel = require('../../models/product.model')
 router.route('/')
@@ -51,6 +52,46 @@ router.route('/')
     .catch(err=>{
         console.log(err)
     })
+})
+
+
+const details  = {
+    id: 123,
+    shipping:{
+        from: "AMWINE",
+        to: "ANKIT PRADHAN",
+        address: "Bhaktapur",
+        city: "Bhaktapur",
+        state: "Bagmati",
+        postalCode: 44812,
+        country: "Nepal",
+    
+    },
+    items: [{
+        name: "THIS WINE",
+        variety: "This",
+        type: "Wine",
+        quantity: 10,
+        price: 1500,
+    },
+    {
+        name: "THIS WINE2",
+        variety: "This2",
+        type: "Wine2",
+        quantity: 5,
+        price: 2500,
+    }]
+    ,
+    subTotal: 5000,
+    shippingFee: 150,
+    total: 2000,
+    paid: 0,
+    remaining: 5150,
+}
+
+router.post('/samplePDF', function(req,res,next){
+    createReceipt(details);
+    console.log('done')
 })
 
 
