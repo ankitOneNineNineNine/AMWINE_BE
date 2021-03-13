@@ -40,7 +40,10 @@ bought: [{
 passwordResetToken: String,
 passwordResetExpiry: String,
 },
-{timestamps:true}
+{timestamps:true},
+{
+    usePushEach: true
+  }
 )
 
 

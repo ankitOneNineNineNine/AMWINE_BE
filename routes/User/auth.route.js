@@ -67,11 +67,12 @@ router.route('/signup')
           config.jwtSecret, 
         );
         
-
-        redisClient.set(token, JSON.stringify(user._id), function(err, reply){
+        redisClient.set(token, `${user._id}`, function(err, reply){
           if(err){
+            console.log(err)
             return next(err)
           }
+          console.log(reply)
           res.status(200).json({
            token,
            user

@@ -19,10 +19,10 @@ module.exports = function (req,res,next){
       })
   }
  else{
-       
+      
         redisClient.get(token, function(err, id){
             if (err) {
-                return next(err)
+                return next(err);
             }
             if(!id)  {
                

@@ -18,7 +18,8 @@ function prepareMail(data) {
     from: 'AMWINE SHOP <noreply@amwineshop.com',
     to: data.email,
     subject: data.subject,
-    html: data.html
+    html: data.html,
+    attachments: data.attachments
   };
   return mailbody;
 };
