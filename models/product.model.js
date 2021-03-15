@@ -18,6 +18,7 @@ const productSchema = new Schema(
 name: {
     type:String,
     required:true,
+    trim:true,
 },
 price: {
     type:Number,
@@ -38,7 +39,8 @@ default: 'wine'
 },
 variety: {
     required:true,
-    type:String
+    type:String,
+    trim:true,
 },
 images: [String],
 addedBy: {

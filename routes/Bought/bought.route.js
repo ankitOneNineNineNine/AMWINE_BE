@@ -116,7 +116,7 @@ router.route('/')
     var mailData = {
         subject: "Bought Receipt",
         html:  `
-        <p>Hi <strong>${user.userName}, </strong></p>
+        <p>Hi <strong>${req.loggedInUser.userName}, </strong></p>
       <p>We thank you for choosing us for buying beverages.</p>
       <p>Buy more than 5 and contact us for more discounts.</p>
       <p>You will be called before delivery shortly</p>

@@ -6,7 +6,8 @@ const adSchema = new Schema({
     title: String,
     image: {
         type:String,
-        required:true
+        required:true,
+        trim:true,
     },
     addedBy: {
         type: Schema.Types.ObjectId,
