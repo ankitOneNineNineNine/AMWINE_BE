@@ -13,7 +13,7 @@ receiptTable(doc, details);
 receiptFooter(doc);
 doc.end();
 
-doc.pipe(fs.createWriteStream('output.pdf'));
+doc.pipe(fs.createWriteStream(`./receipts/${details.saveAs}.pdf`));
 
 }
 
@@ -56,7 +56,7 @@ function shippingInfo(doc, details){
     doc
     .text(`Invoice Number: ${details.id}`, 50, 200)
     .text(`Invoice Date: ${new Date()}`, 50, 215)
-    .text(`Balance Due: ${details.subTotal - details.paid}`, 50, 130)
+    .text(`Balance Due: ${details.total - details.paid}`, 50, 130)
     .text(shipping.name, 300, 200)
     .text(shipping.address, 350, 215)
     .moveDown();

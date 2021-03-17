@@ -39,15 +39,17 @@ const productModel = require('../../models/product.model')
 //     paid: 0,
 //     remaining: 5150,
 // }
-router.route('/')
+router.route('/:id')
+
 .get(function(req,res,next){
-    boughtModel.find({})
+    boughtModel.find({_id: req.params.id})
     .exec(function(err, bought){
         if(err) return next(err);
         if(!bought) return next({msg: 'Noone bought yet'});
-        res.status(200).json(bought)
+        res.status(200).json(bought[0])
     })
 })
+router.route('/')
 .post(function(req,res,next){
     let user = req.loggedInUser._id;
 
@@ -59,6 +61,7 @@ router.route('/')
         total: subTotal+shippingCharge,
         paid: 0,
         remaining: subTotal+shippingCharge,
+        saveAs: `${Date.now()}-${req.loggedInUser.userName}`
      }
 
     let products = [];
@@ -97,7 +100,7 @@ router.route('/')
             let quantity = product.quantity;
             productModel.findById(productId)
             .then(async p=>{
-                p.sold = quantity;
+                p.sold =p.sold? p.sold+ quantity : quantity;
                 await p.save();
                 details["items"] = [...details.items, {
                     name: p.name,
@@ -125,8 +128,8 @@ router.route('/')
         `,
         email: cUser.email,
         attachments: [{
-            filename: 'output.pdf',
-            path: path.join(__dirname, "../../output.pdf"),
+            filename: 'Receipt.pdf',
+            path: path.join(__dirname, `../../receipts/${details.saveAs}.pdf`),
             contentType: 'application/pdf'
         }]
       };
@@ -143,12 +146,6 @@ router.route('/')
     })
 })
 
-
-
-router.post('/samplePDF', function(req,res,next){
-    
-    console.log('done')
-})
 
 
 module.exports = router;
