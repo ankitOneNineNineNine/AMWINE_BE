@@ -1,8 +1,10 @@
 const redis = require("redis");
+var url = require('url');
+var redisURL = url.parse(process.env.REDISCLOUD_URL);
 
 const redisClient = redis.createClient({
-    host: process.env.REDISCLOUD_URL||'localhost',
-    port: 6379
+    host: redisURL.hostname||'localhost',
+    port: redisURL.port
   })
 redisClient.on("connect", function(){
     console.log("Connected to Redis Client")
