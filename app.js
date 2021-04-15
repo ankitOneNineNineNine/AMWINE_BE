@@ -70,7 +70,7 @@ app.use(function(err, req, res, next) {
 });
 });
 
-app.listen(8000, ()=>{
+app.listen(process.env.PORT||8000, ()=>{
   console.log('Connected to 8000')
 })
 
