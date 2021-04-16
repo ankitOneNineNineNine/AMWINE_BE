@@ -8,13 +8,14 @@ var adminAuth = require('./routes/Admin/admin.auth.route');
 var userRoute = require('./routes/User/user.route');
 const publicUserRoute = require('./routes/User/public.user.route');
 const postRoute = require('./routes/Ad/ad.route');
-require('./databases/mongo.db')
 var cors = require('cors');
 const productRoute = require('./routes/Product/product.route')
 const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize');
 const boughtRoute = require('./routes/Bought/bought.route')
+require('dotenv').config()
+require('./databases/mongo.db')
 
 
 
