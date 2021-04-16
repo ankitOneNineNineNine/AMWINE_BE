@@ -35,7 +35,11 @@ app.use("/ProfilePictures", express.static(path.join(__dirname, 'ProfilePictures
 app.use("/ProductImages", express.static(path.join(__dirname, 'ProductImages')));
 app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
 
+//test route
 
+app.use('/', function(req,res,next){
+  res.json('WORKING FINE')
+}
 
 //auth route
 
