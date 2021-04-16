@@ -38,8 +38,8 @@ app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
 //test route
 
 app.get('/', function(req,res,next){
-  res.json('WORKING FINE')
-}
+  res.status(200).json('WORKING FINE')
+})
 
 //auth route
 
