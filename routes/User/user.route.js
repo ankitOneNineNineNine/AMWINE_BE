@@ -4,20 +4,16 @@ const { update } = require('../../models/user.model');
 const userModel = require('../../models/user.model');
 const fs = require('fs');
 const path = require('path');
+const { uploadCloudinary } = require('../../middlewares/upload.cloudinary');
 var router = express.Router();
 
 router.route('/')
 .get(function(req,res,next){
   res.status(200).json(req.loggedInUser)
 })
-.put(uploadProfileImage.single('image'),function(req,res,next){
+.put(uploadProfileImage.single('image'),async function(req,res,next){
   let {fullName, password, number, address,cart} = req.body;
  
-  let fileName;
- 
-  if(req.file){
-     fileName = req.file.filename;
-  }
 
   let updatedUser =req.loggedInUser;
   if(fullName){
@@ -33,12 +29,18 @@ router.route('/')
     updatedUser.number = number;
   }
   
-  if(fileName){
-    if(updatedUser.image){
-      let picPath = path.join(process.cwd(), `ProfilePictures/${req.loggedInUser.image}`);
-      fs.unlinkSync(picPath)
+  if(req.file){
+    let profileImages = await uploadCloudinary(
+      [req.file],
+      "profiles"
+    );
+    if (profileImages.msg === "err") {
+      return next(profileImages.err);
     }
-    updatedUser.image = fileName
+
+    // updatedUser.image = fileName
+
+    updatedUser.image = profileImages.urls[0];
   }
   if(address){
     updatedUser.address = address;

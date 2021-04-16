@@ -13,7 +13,9 @@ const productRoute = require('./routes/Product/product.route')
 const authenticate = require('./middlewares/authenticate');
 const {secondaryAuthorization} = require('./middlewares/authorize')
 const {primaryAuthorization} = require('./middlewares/authorize');
-const boughtRoute = require('./routes/Bought/bought.route')
+const boughtRoute = require('./routes/Bought/bought.route');
+const uploadCloudinary = require('./middlewares/upload.cloudinary');
+const uploadProductImages = require('./middlewares/upload.product');
 require('dotenv').config()
 require('./databases/mongo.db')
 
@@ -40,6 +42,15 @@ app.use("/adImage", express.static(path.join(__dirname, 'AdImage')));
 app.get('/', function(req,res,next){
   res.status(200).json('WORKING FINE')
 })
+
+//test cloudinary
+
+// app.post('/123',uploadProductImages.single('img'), async function(req,res,next){
+//   let urls = await uploadCloudinary.uploadCloudinary([req.file.filename], 'products')
+
+//   res.status(200).json(urls)
+// })
+
 
 //auth route
 
