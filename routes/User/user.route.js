@@ -14,7 +14,7 @@ router.route('/')
 .put(uploadProfileImage.single('image'),async function(req,res,next){
   let {fullName, password, number, address,cart} = req.body;
  
-
+console.log(fullName, password, number, address, cart)
   let updatedUser =req.loggedInUser;
   if(fullName){
     updatedUser.fullName = fullName
@@ -30,6 +30,7 @@ router.route('/')
   }
   
   if(req.file){
+    console.log(req.file)
     let profileImages = await uploadCloudinary(
       [req.file],
       "profiles"

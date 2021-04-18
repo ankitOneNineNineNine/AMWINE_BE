@@ -19,7 +19,7 @@ module.exports = function (req,res,next){
             if (err) {
                 return next(err);
             }            
-            console.log(token, id)
+            
          if(id){
                 userModel.findById(id)
                 .then(user=>{
