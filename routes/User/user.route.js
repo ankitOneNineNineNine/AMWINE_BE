@@ -39,7 +39,7 @@ router.route('/')
     }
 
     // updatedUser.image = fileName
-
+    console.log(profileImages)
     updatedUser.image = profileImages.urls[0];
   }
   if(address){
